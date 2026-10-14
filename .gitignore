@@ -1,0 +1,23 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+# Java
+**/target/
+**/.idea/
+# Angular/Node
+**/node_modules/
+**/dist/
+**/.angular/
+# Python
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+# OS
+.DS_Store
+Thumbs.db
+
+# Local validation artifacts
+output/
+.playwright-cli/
+*.log
