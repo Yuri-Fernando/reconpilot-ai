@@ -380,7 +380,7 @@ cd ai-service;  & $Py310 -m pip install -r requirements-dev.txt; & $Py310 -m pyt
 | Windows / PowerShell | Backend, frontend, testes e Python **executados na revisão v0.2.1** |
 | Linux / macOS | Comandos equivalentes (`./mvnw`, `python3.10`) **não verificados** nesta revisão |
 | Docker | Imagem do `ai-service` construída e verificada (`/healthz`, usuário não-root) na v0.2.1; `docker compose up -d db` verificado na v0.2.0 |
-| GitHub Actions | Workflow em `.github/workflows/ci.yml` (backend, frontend, analytics) |
+| GitHub Actions | Primeira execução **verde** (backend, frontend e analytics) no commit `8a9526a`: Ubuntu, JDK 21, Node 24, Python 3.10 |
 
 > Em pasta sincronizada (Google Drive/OneDrive), `mvnw` e `npm install` podem travar. Nesse caso copie `backend/` e `frontend/` para uma pasta local e rode lá.
 

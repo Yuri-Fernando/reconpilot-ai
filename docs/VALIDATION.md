@@ -61,6 +61,10 @@ Imagem do `ai-service`: `docker build` com os pins corrigidos (numpy 2.2.6, scik
 
 Rodar tres suites pesadas ao mesmo tempo na mesma maquina produziu dois falsos negativos: (1) timeout de 2 s do cliente HTTP em `HttpAnalyticsClientContractTest`, corrigido dando folga de 10 s aos testes de sucesso (o teste de timeout segue em 100 ms); (2) `Timeout waiting for worker to respond` do Vitest, falha de inicializacao de workers sob carga que passou na reexecucao isolada (7 testes). Os numeros acima sao das execucoes isoladas.
 
+### CI no GitHub Actions
+
+A primeira execucao do workflow (commit `8a9526a`, Ubuntu) terminou verde nos tres jobs: `backend` (`./mvnw verify` com PostgreSQL via Testcontainers), `frontend` (`npm ci`, testes e build) e `analytics` (`pip install -r requirements-dev.txt` com os pins de `requirements.txt` em Python 3.10, seguido de `pytest`). Isso confirma, fora da maquina local, o bit de execucao do `mvnw` e a resolucao dos pins Python.
+
 ### Nao validado
 
-Alem do que ja consta acima: o workflow do GitHub Actions ainda nao tinha sido executado ao fechar esta revisao; os testes Python usaram as versoes ja instaladas na maquina (numpy 2.2.6, scikit-learn 1.7.2, fastapi 0.136.3, pydantic 2.12.5, pytest 9.0.1), enquanto os pins de `requirements.txt` foram validados pelo `docker build`; nao ha suite E2E automatizada.
+Os testes Python locais usaram as versoes ja instaladas na maquina (numpy 2.2.6, scikit-learn 1.7.2, fastapi 0.136.3, pydantic 2.12.5, pytest 9.0.1); a combinacao exata dos pins foi exercitada pelo `docker build` e pelo job `analytics` do CI. Nao ha suite E2E automatizada.
