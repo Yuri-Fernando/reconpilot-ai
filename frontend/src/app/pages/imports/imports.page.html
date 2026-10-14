@@ -1,0 +1,53 @@
+<header class="page-head">
+  <div><h1>Importar e reconciliar</h1><p>Envie os dois lados da operação. O arquivo inteiro é validado antes de qualquer persistência.</p></div>
+  <a class="button button-ghost" href="/demo-data/bank_transactions.csv" download>↓ CSV bancário de demo</a>
+</header>
+
+@if (error(); as issue) { <div class="notice notice-error" role="alert"><span>!</span><div><strong>{{ issue.code }}</strong><br>{{ issue.detail }} @if(issue.traceId){<small> · trace {{ issue.traceId }}</small>}</div></div> }
+@if (success()) { <div class="notice notice-success" role="status"><span>✓</span>{{ success() }}</div> }
+
+<section class="steps" aria-label="Etapas da conciliação">
+  <div class="active"><span>1</span><p><strong>Importar arquivos</strong><small>CSV UTF-8 validado</small></p></div><i></i>
+  <div [class.active]="ready()"><span>2</span><p><strong>Executar regras</strong><small>Motor one-to-one</small></p></div><i></i>
+  <div><span>3</span><p><strong>Revisar exceções</strong><small>Motivos auditáveis</small></p></div>
+</section>
+
+<section class="upload-grid">
+  <article class="card panel upload-card">
+    <div class="source-head"><span class="source-icon bank">B</span><div><h2>Extrato bancário</h2><p>Origem BANK · até 2 MB / 5.000 linhas</p></div></div>
+    <label class="drop-zone" [class.has-file]="bankFile()">
+      <input type="file" accept=".csv,text/csv" (change)="selectFile($event, 'BANK')">
+      <span>{{ bankFile() ? '✓' : '⇧' }}</span>
+      <strong>{{ bankFile()?.name ?? 'Selecionar bank_transactions.csv' }}</strong>
+      <small>{{ bankFile() ? (bankFile()!.size / 1024).toFixed(1) + ' KB' : 'Delimitador ; · moeda BRL · data ISO' }}</small>
+    </label>
+    <button class="button button-primary" type="button" (click)="upload('BANK')" [disabled]="!bankFile() || uploading() !== null">
+      {{ uploading() === 'BANK' ? 'Validando e persistindo…' : 'Importar arquivo bancário' }}
+    </button>
+  </article>
+
+  <article class="card panel upload-card">
+    <div class="source-head"><span class="source-icon ledger">E</span><div><h2>Razão contábil / ERP</h2><p>Origem LEDGER · até 2 MB / 5.000 linhas</p></div></div>
+    <label class="drop-zone" [class.has-file]="ledgerFile()">
+      <input type="file" accept=".csv,text/csv" (change)="selectFile($event, 'LEDGER')">
+      <span>{{ ledgerFile() ? '✓' : '⇧' }}</span>
+      <strong>{{ ledgerFile()?.name ?? 'Selecionar ledger_entries.csv' }}</strong>
+      <small>{{ ledgerFile() ? (ledgerFile()!.size / 1024).toFixed(1) + ' KB' : 'Mesmo contrato, fonte independente' }}</small>
+    </label>
+    <button class="button button-primary" type="button" (click)="upload('LEDGER')" [disabled]="!ledgerFile() || uploading() !== null">
+      {{ uploading() === 'LEDGER' ? 'Validando e persistindo…' : 'Importar arquivo do ERP' }}
+    </button>
+  </article>
+</section>
+
+<section class="card panel batch-panel">
+  <div class="panel-head"><div><h2>Lotes selecionados</h2><p>Você também pode reutilizar imports já persistidos; a mesma combinação retorna a run existente.</p></div><span class="safe-note">◇ idempotente</span></div>
+  @if (loading()) { <div class="loading">Consultando lotes persistidos…</div> } @else {
+    <div class="batch-selectors">
+      <div class="field"><label for="bank-batch">Lote bancário</label><select id="bank-batch" [value]="selectedBankId()" (change)="setBatch('BANK', $event)"><option value="" [selected]="!selectedBankId()">Selecione</option>@for(batch of bankBatches();track batch.batchId){<option [value]="batch.batchId" [selected]="batch.batchId === selectedBankId()">{{ batch.fileName }} · {{ batch.rowCount }} linhas · {{ batch.createdAt | date:'dd/MM HH:mm' }}</option>}</select></div>
+      <span class="versus">×</span>
+      <div class="field"><label for="ledger-batch">Lote ERP</label><select id="ledger-batch" [value]="selectedLedgerId()" (change)="setBatch('LEDGER', $event)"><option value="" [selected]="!selectedLedgerId()">Selecione</option>@for(batch of ledgerBatches();track batch.batchId){<option [value]="batch.batchId" [selected]="batch.batchId === selectedLedgerId()">{{ batch.fileName }} · {{ batch.rowCount }} linhas · {{ batch.createdAt | date:'dd/MM HH:mm' }}</option>}</select></div>
+    </div>
+    <div class="execute-row"><p><strong>rules-v1</strong><span>Referência única → valor/data bilateralmente únicos → sobras. Ambiguidades nunca são autopareadas.</span></p><button class="button button-primary run-button" type="button" (click)="execute()" [disabled]="!ready()">{{ running() ? 'Executando…' : 'Executar conciliação →' }}</button></div>
+  }
+</section>

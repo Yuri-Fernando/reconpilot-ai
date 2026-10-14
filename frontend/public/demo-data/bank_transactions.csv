@@ -1,0 +1,13 @@
+external_id;reference;transaction_date;amount;currency;description
+BANK-001;REF-1001;2026-10-10;125.00;BRL;Pagamento mercado
+BANK-002;REF-1002;2026-10-11;250.00;BRL;Fornecedor Alfa
+BANK-003;REF-1003;2026-10-10;315.50;BRL;Fornecedor Beta
+BANK-004;REF-1004;2026-10-10;87.90;BRL;Pagamento de servico
+BANK-005;;2026-10-12;72.40;BRL;Compra sem referencia
+BANK-006;;2026-10-12;44.00;BRL;Pagamento A sem referencia
+BANK-007;REF-UNMATCHED-B;2026-10-10;150.00;BRL;Saida sem lancamento
+BANK-008;REF-2000;2026-10-11;20.00;BRL;Lancamento duplicado A
+BANK-009;REF-2000;2026-10-11;20.00;BRL;Lancamento duplicado B
+BANK-010;REF-1005;2026-10-11;99.99;BRL;Correspondencia exata 2
+BANK-011;REF-1006;2026-10-10;0.30;BRL;Teste dos centavos
+BANK-012;REF-1007;2026-10-10;-49.90;BRL;Estorno

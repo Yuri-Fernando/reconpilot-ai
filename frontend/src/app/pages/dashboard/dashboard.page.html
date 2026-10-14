@@ -1,0 +1,55 @@
+<header class="page-head">
+  <div><h1>Visão geral</h1><p>Acompanhe o último ciclo de conciliação e as exceções que exigem atenção.</p></div>
+  <div class="page-actions">
+    <button class="button button-ghost" type="button" (click)="refresh()" [disabled]="loading()">↻ Atualizar</button>
+    <a class="button button-primary" routerLink="/imports">＋ Nova conciliação</a>
+  </div>
+</header>
+
+@if (error(); as issue) {
+  <div class="notice notice-error" role="alert"><span>!</span><div><strong>{{ issue.code }}</strong><br>{{ issue.detail }}</div></div>
+} @else if (loading()) {
+  <div class="metrics"><div class="metric skeleton"></div><div class="metric skeleton"></div><div class="metric skeleton"></div><div class="metric skeleton"></div></div>
+} @else if (!hasData()) {
+  <section class="card empty-hero">
+    <span class="hero-icon">⇄</span><p class="kicker">PRIMEIRO CICLO</p><h2>Pronto para reconciliar</h2>
+    <p>Importe o extrato bancário e o razão contábil sintéticos. O motor aplicará regras determinísticas e persistirá cada decisão.</p>
+    <a class="button button-primary" routerLink="/imports">Importar os CSVs</a>
+  </section>
+} @else if (summary(); as data) {
+  <section class="metrics" aria-label="Indicadores da última conciliação">
+    <article class="card metric"><span class="metric-icon teal">↔</span><div><small>Volume bancário</small><strong>{{ formatBrl(data.volume) }}</strong><em>{{ data.bankCount }} lançamentos</em></div></article>
+    <article class="card metric"><span class="metric-icon green">✓</span><div><small>Conciliados</small><strong>{{ data.matched }}</strong><em>{{ data.reconciliationRate }}% do universo comparável</em></div></article>
+    <article class="card metric"><span class="metric-icon amber">!</span><div><small>Exceções pendentes</small><strong>{{ data.exceptionsPending }}</strong><em>{{ data.possible }} vínculos possíveis</em></div></article>
+    <article class="card metric"><span class="metric-icon blue">◎</span><div><small>Revisões registradas</small><strong>{{ data.reviewed }}</strong><em>trilha append-only</em></div></article>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="card panel health-panel">
+      <div class="panel-head"><div><h2>Saúde da conciliação</h2><p>Última execução do motor rules-v1</p></div><span class="status status-success">Concluída</span></div>
+      <div class="rate-ring" [style.--rate]="data.reconciliationRate + '%'">
+        <div><strong>{{ data.reconciliationRate }}%</strong><span>taxa de conciliação</span></div>
+      </div>
+      <div class="health-legend"><span><i class="matched"></i>{{ data.matched }} conciliados</span><span><i class="exceptions"></i>{{ data.exceptionsPending }} pendentes</span></div>
+      <a [routerLink]="['/reconciliations', data.lastRun?.runId]" class="button button-secondary">Ver resultados detalhados →</a>
+    </article>
+
+    <article class="card panel run-panel">
+      <div class="panel-head"><div><h2>Últimas execuções</h2><p>Histórico persistido no PostgreSQL</p></div><a routerLink="/reconciliations">Ver todas</a></div>
+      <div class="run-list">
+        @for (run of runs(); track run.runId) {
+          <a [routerLink]="['/reconciliations', run.runId]" class="run-row">
+            <span class="run-glyph">⇄</span><div><strong>Conciliação {{ run.runId.slice(0, 8) }}</strong><small>{{ run.createdAt | date:'dd/MM/yyyy · HH:mm' }} · {{ run.algorithmVersion }}</small></div>
+            <span class="status status-{{ tone(run.status) }}">{{ runLabel(run.status) }}</span><b>›</b>
+          </a>
+        } @empty { <div class="empty-state"><strong>Nenhuma execução</strong>O histórico aparecerá aqui.</div> }
+      </div>
+    </article>
+  </section>
+
+  <section class="card assurance">
+    <div><span>01</span><p><strong>Regra determinística</strong><small>Referência única tem prioridade sobre valor/data.</small></p></div>
+    <div><span>02</span><p><strong>One-to-one</strong><small>Cada transação participa de no máximo um par por run.</small></p></div>
+    <div><span>03</span><p><strong>IA apenas advisory</strong><small>Scores nunca alteram o resultado financeiro.</small></p></div>
+  </section>
+}

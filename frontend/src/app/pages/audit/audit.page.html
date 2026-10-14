@@ -1,0 +1,11 @@
+<header class="page-head"><div><h1>Trilha de auditoria</h1><p>Decisões humanas append-only, separadas dos lançamentos financeiros originais.</p></div></header>
+<section class="card panel">
+  <div class="audit-toolbar"><div class="field"><label for="audit-run">Execução</label><select id="audit-run" [value]="selectedRun()" (change)="selectRun($event)">@for(run of runs();track run.runId){<option [value]="run.runId">{{run.createdAt|date:'dd/MM/yyyy HH:mm'}} · {{run.runId.slice(0,8)}}</option>}</select></div><span>Identidade demo: <strong>DEMO_ANALYST</strong></span></div>
+  @if(error();as issue){<div class="notice notice-error"><strong>{{issue.code}}</strong> {{issue.detail}}</div>}
+  @if(loading()){<div class="loading">Carregando eventos…</div>}@else{
+    <div class="timeline">
+      @for(event of events();track event.id){<article><span class="timeline-dot" [class.reject]="event.action==='REJECT'"></span><div class="event-card"><header><div><strong>{{event.action==='APPROVE'?'Vínculo aprovado':'Vínculo rejeitado'}}</strong><small>{{event.createdAt|date:'dd/MM/yyyy · HH:mm:ss'}}</small></div><span class="status status-{{event.action==='APPROVE'?'success':'danger'}}">{{event.newStatus}}</span></header><p>{{event.justification}}</p><footer><span>Item <b class="mono">{{event.itemId.slice(0,8)}}</b></span><span>{{event.previousStatus}} → {{event.newStatus}}</span><span>{{event.actor}}</span></footer></div></article>}
+      @empty{<div class="empty-state"><strong>Nenhuma revisão nesta execução</strong>As ações realizadas no detalhe de uma exceção aparecerão aqui.</div>}
+    </div>
+  }
+</section>

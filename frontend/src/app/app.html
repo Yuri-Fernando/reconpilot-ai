@@ -1,0 +1,37 @@
+<div class="app-shell" [class.menu-open]="menuOpen()">
+  <aside class="sidebar" aria-label="Navegação principal">
+    <a class="brand" routerLink="/dashboard" (click)="closeMenu()" aria-label="ReconPilot AI — início">
+      <span class="brand-mark" aria-hidden="true">RP</span>
+      <span><strong>ReconPilot</strong><small>Financial operations</small></span>
+    </a>
+
+    <nav>
+      <span class="nav-label">Operação</span>
+      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()"><span aria-hidden="true">⌂</span> Visão geral</a>
+      <a routerLink="/imports" routerLinkActive="active" (click)="closeMenu()"><span aria-hidden="true">⇧</span> Importar dados</a>
+      <a routerLink="/reconciliations" routerLinkActive="active" (click)="closeMenu()"><span aria-hidden="true">⇄</span> Conciliações</a>
+      <a routerLink="/audit" routerLinkActive="active" (click)="closeMenu()"><span aria-hidden="true">✓</span> Auditoria</a>
+      <span class="nav-label nav-label-secondary">Projeto</span>
+      <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()"><span aria-hidden="true">i</span> Arquitetura</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="environment"><span></span><div><strong>Ambiente local</strong><small>Dados 100% sintéticos</small></div></div>
+      <p>v0.2 · {{ year }}</p>
+    </div>
+  </aside>
+
+  <button class="backdrop" aria-label="Fechar menu" (click)="closeMenu()"></button>
+
+  <main class="main-area">
+    <header class="topbar">
+      <button class="menu-button" type="button" (click)="menuOpen.set(!menuOpen())" aria-label="Abrir menu">☰</button>
+      <div class="context">
+        <span class="eyebrow">CONSOLE DE OPERAÇÕES</span>
+        <span class="demo-badge"><i></i> Demo · dados sintéticos</span>
+      </div>
+      <div class="operator" aria-label="Operador atual"><span>DA</span><div><strong>Demo Analyst</strong><small>Revisão humana</small></div></div>
+    </header>
+    <section class="content"><router-outlet /></section>
+  </main>
+</div>

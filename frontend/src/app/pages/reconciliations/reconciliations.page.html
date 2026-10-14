@@ -1,0 +1,11 @@
+<header class="page-head"><div><h1>Conciliações</h1><p>Histórico de execuções idempotentes e persistidas pelo backend.</p></div><a class="button button-primary" routerLink="/imports">＋ Nova conciliação</a></header>
+<section class="card panel">
+  <div class="toolbar"><div class="field search"><label for="run-search">Buscar por ID</label><input id="run-search" type="search" placeholder="run ou lote…" [value]="query()" (input)="setQuery($any($event.target).value)"></div><button class="button button-ghost" type="button" (click)="load()">↻ Atualizar</button></div>
+  @if(error();as issue){<div class="notice notice-error"><strong>{{issue.code}}</strong> {{issue.detail}}</div>}
+  @if(loading()){<div class="loading">Consultando execuções…</div>}@else{
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Execução</th><th>Iniciada</th><th>Lote banco</th><th>Lote ERP</th><th>Algoritmo</th><th>Status</th><th></th></tr></thead><tbody>
+      @for(run of filtered();track run.runId){<tr><td><strong class="mono">{{run.runId.slice(0,8)}}</strong></td><td>{{run.createdAt|date:'dd/MM/yyyy HH:mm:ss'}}</td><td class="mono">{{run.bankBatchId.slice(0,8)}}</td><td class="mono">{{run.ledgerBatchId.slice(0,8)}}</td><td><span class="algorithm">{{run.algorithmVersion}}</span></td><td><span class="status status-{{tone(run.status)}}">{{run.status}}</span></td><td><a class="detail-link" [routerLink]="['/reconciliations',run.runId]">Abrir →</a></td></tr>}
+      @empty{<tr><td colspan="7"><div class="empty-state"><strong>Nenhuma conciliação encontrada</strong>Importe dois lotes para iniciar.</div></td></tr>}
+    </tbody></table></div>
+  }
+</section>

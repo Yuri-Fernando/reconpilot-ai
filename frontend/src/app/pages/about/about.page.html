@@ -1,0 +1,12 @@
+<header class="page-head"><div><h1>Arquitetura e limites</h1><p>Uma demonstração técnica honesta: dados sintéticos, regras explícitas e analítica sem poder decisório.</p></div><span class="status status-info">PORTFÓLIO · MVP LOCAL</span></header>
+<section class="architecture card panel">
+  <div class="node web"><span>INTERFACE</span><strong>Angular 22 / PWA</strong><small>Rotas lazy · Signals · HttpClient</small></div><i>HTTP / JSON<br><b>↓</b></i>
+  <div class="node core"><span>SYSTEM OF RECORD</span><strong>Java 21 / Spring Boot 4.1</strong><small>CSV → regras one-to-one → auditoria → REST</small></div><div class="branches"><i>JPA / Flyway<br><b>↙</b></i><i>HTTP interno + token / 2s<br><b>↘</b></i></div>
+  <div class="bottom-nodes"><div class="node db"><span>PERSISTÊNCIA</span><strong>PostgreSQL 16</strong><small>Schema app · originais imutáveis</small></div><div class="node ai"><span>ADVISORY OPCIONAL</span><strong>Python 3.10 / FastAPI</strong><small>Score explicável · sem writeback</small></div></div>
+</section>
+<section class="principles">
+  <article class="card panel"><span>01</span><h2>Determinístico primeiro</h2><p>Referência única tem prioridade. Sem referência, um vínculo só é sugerido quando valor/data forem únicos nos dois sentidos.</p></article>
+  <article class="card panel"><span>02</span><h2>Ambiguidade é estado</h2><p>Candidatos concorrentes nunca são resolvidos por heurística gulosa, descrição ou modelo probabilístico.</p></article>
+  <article class="card panel"><span>03</span><h2>Auditoria separada</h2><p>Aprovar ou rejeitar atualiza apenas o estado de revisão e adiciona evento; nenhum valor de origem é reescrito.</p></article>
+</section>
+<section class="card panel boundaries"><h2>Limites explícitos desta entrega</h2><div><p><strong>✓ Implementado</strong><span>Importação CSV, PostgreSQL/Flyway, matching 1:1, API, Angular responsivo, revisão e analítica advisory isolada.</span></p><p><strong>◌ Planejado</strong><span>Autenticação, tenancy, hardening para produção, dados reais, deploy cloud e empacotamento nativo.</span></p><p><strong>× Fora de escopo</strong><span>Movimentação de fundos, conexão bancária, alegação de fraude ou segurança bancária de produção.</span></p></div></section>

@@ -1,0 +1,43 @@
+<header class="page-head">
+  <div><span class="run-overline">RUN {{ runId.slice(0, 8) }} · RULES-V1</span><h1>Resultado da conciliação</h1><p>Motivos rastreáveis, valores originais imutáveis e revisão humana separada.</p></div>
+  <div class="page-actions"><button class="button button-ghost" type="button" (click)="load()">↻ Atualizar</button><span class="status status-success">Execução concluída</span></div>
+</header>
+@if(error();as issue){<div class="notice notice-error" role="alert"><span>!</span><div><strong>{{issue.code}}</strong><br>{{issue.detail}}</div></div>}
+@if(success()){<div class="notice notice-success">✓ {{success()}}</div>}
+
+@if(summary();as data){
+  <section class="summary-strip card">
+    <div><small>Banco</small><strong>{{data.bankCount}}</strong></div><div><small>ERP</small><strong>{{data.ledgerCount}}</strong></div><div class="positive"><small>Conciliados</small><strong>{{data.matched}}</strong></div><div class="attention"><small>Possíveis</small><strong>{{data.possible}}</strong></div><div class="negative"><small>Exceções</small><strong>{{data.exceptions}}</strong></div><div><small>Valor sem par</small><strong>{{formatBrl(data.unmatchedTotalAmount)}}</strong></div><div class="rate"><small>Taxa</small><strong>{{data.reconciliationRate}}%</strong></div>
+  </section>
+  <section class="status-cards">
+    <button type="button" [class.active]="filter()===''" (click)="filter.set('');load(0)"><span>Todos</span><strong>{{page()?.totalElements ?? 0}}</strong></button>
+    @for(status of statuses;track status){@if(count(status)>0){<button type="button" [class.active]="filter()===status" (click)="filter.set(status);load(0)"><span>{{statusLabel(status)}}</span><strong>{{count(status)}}</strong></button>}}
+  </section>
+}
+
+<section class="card panel results-panel">
+  <div class="results-toolbar"><div class="field search"><label for="item-search">Buscar na página</label><input id="item-search" type="search" placeholder="ID, referência ou motivo…" [value]="query()" (input)="setQuery($event)"></div><div class="field status-filter"><label for="status-filter">Status</label><select id="status-filter" [value]="filter()" (change)="setFilter($event)"><option value="">Todos</option>@for(status of statuses;track status){<option [value]="status">{{statusLabel(status)}}</option>}</select></div><span class="advisory-state">Analítica: <strong>{{analytics()?.status ?? '—'}}</strong></span></div>
+  @if(loading()){<div class="loading">Consultando itens persistidos…</div>}@else{
+  <div class="table-wrap"><table class="data-table result-table"><thead><tr><th>Banco</th><th>Data</th><th>Referência</th><th>Valor banco</th><th>Valor ERP</th><th>Status</th><th>Advisory</th><th></th></tr></thead><tbody>
+    @for(item of visibleItems();track item.id){<tr (click)="open(item)" tabindex="0" (keydown.enter)="open(item)"><td><strong>{{item.bank?.externalId ?? '—'}}</strong><small>{{item.ledger?.externalId ?? 'Sem contraparte'}}</small></td><td>{{(item.bank?.transactionDate ?? item.ledger?.transactionDate)|date:'dd/MM/yyyy'}}</td><td class="mono">{{item.bank?.reference ?? item.ledger?.reference ?? '—'}}</td><td class="money">{{item.bank ? formatBrl(item.bank.amount) : '—'}}</td><td class="money">{{item.ledger ? formatBrl(item.ledger.amount) : '—'}}</td><td><span class="status status-{{statusTone(item.status)}}">{{statusLabel(item.status)}}</span></td><td>@if(assessment(item.id);as score){<span class="risk risk-{{score.severity}}">{{(score.score*100).toFixed(0)}}</span>}@else{<span class="muted">—</span>}</td><td><button type="button" class="row-open" aria-label="Abrir detalhes">›</button></td></tr>}
+    @empty{<tr><td colspan="8"><div class="empty-state"><strong>Nenhum item neste filtro</strong>Ajuste o status ou a busca.</div></td></tr>}
+  </tbody></table></div>
+  @if(page();as pagination){<div class="pagination"><span>Página {{pagination.page+1}} de {{pagination.totalPages || 1}} · {{pagination.totalElements}} itens</span><div><button class="button button-ghost" [disabled]="pagination.page===0" (click)="load(pagination.page-1)">←</button><button class="button button-ghost" [disabled]="pagination.page+1>=pagination.totalPages" (click)="load(pagination.page+1)">→</button></div></div>}
+  }
+</section>
+
+@if(selected();as item){
+  <button class="drawer-backdrop" type="button" (click)="close()" aria-label="Fechar detalhes"></button>
+  <aside class="detail-drawer" aria-label="Detalhes da exceção">
+    <header><div><span class="status status-{{statusTone(item.status)}}">{{statusLabel(item.status)}}</span><h2>Detalhe do item</h2><p class="mono">{{item.id}}</p></div><button type="button" (click)="close()" aria-label="Fechar">×</button></header>
+    <section class="reason"><span>Regra aplicada</span><strong>{{item.reasonCode}}</strong><p>{{item.explanation}}</p></section>
+    <section class="comparison"><article><span>BANCO</span><strong>{{item.bank?.externalId ?? 'Sem lançamento'}}</strong><dl><dt>Data</dt><dd>{{item.bank?.transactionDate ?? '—'}}</dd><dt>Referência</dt><dd>{{item.bank?.reference ?? '—'}}</dd><dt>Valor</dt><dd class="money">{{item.bank ? formatBrl(item.bank.amount) : '—'}}</dd><dt>Descrição</dt><dd>{{item.bank?.description ?? '—'}}</dd></dl></article><div class="compare-mark">⇄</div><article><span>ERP</span><strong>{{item.ledger?.externalId ?? 'Sem lançamento'}}</strong><dl><dt>Data</dt><dd>{{item.ledger?.transactionDate ?? '—'}}</dd><dt>Referência</dt><dd>{{item.ledger?.reference ?? '—'}}</dd><dt>Valor</dt><dd class="money">{{item.ledger ? formatBrl(item.ledger.amount) : '—'}}</dd><dt>Descrição</dt><dd>{{item.ledger?.description ?? '—'}}</dd></dl></article></section>
+    @if(assessment(item.id);as score){<section class="analytics-card"><div><span>ANÁLISE AUXILIAR</span><strong>{{score.severity}} · {{(score.score*100).toFixed(0)}}/100</strong></div><p>Score não calibrado, sem autoridade de decisão. Método {{score.method}}, versão {{score.modelVersion}}.</p></section>}@else if(analytics()?.status==='DISABLED'){<div class="notice notice-info">Analítica opcional desabilitada. A conciliação determinística permanece completa.</div>}
+    <section class="review-block"><div class="review-title"><h3>Decisão humana</h3><span class="status status-{{item.reviewStatus==='PENDING'?'warning':'success'}}">{{item.reviewStatus}}</span></div>
+      @if(item.reviewStatus==='PENDING'){
+        <div class="field"><label for="justification">Justificativa obrigatória</label><textarea id="justification" [formControl]="reviewJustification" placeholder="Registre o motivo da decisão (mínimo 5 caracteres)…"></textarea>@if(reviewJustification.touched&&reviewJustification.invalid){<small class="form-error">Informe uma justificativa entre 5 e 1.000 caracteres.</small>}</div>
+        <div class="review-actions"><button class="button button-danger" type="button" (click)="review('REJECT')" [disabled]="reviewing()">Rejeitar</button><button class="button button-primary" type="button" (click)="review('APPROVE')" [disabled]="reviewing()">Aprovar vínculo</button></div>
+      }@else{<p class="closed-review">Este item não requer decisão ou já possui revisão definitiva. Os dados originais não foram alterados.</p>}
+    </section>
+  </aside>
+}
