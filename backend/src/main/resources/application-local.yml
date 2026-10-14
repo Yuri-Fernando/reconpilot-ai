@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: ${DB_JDBC_URL:jdbc:postgresql://localhost:5432/reconpilot}
+    username: ${DB_USERNAME:reconpilot}
+    password: ${DB_PASSWORD:dev_only_change_me}

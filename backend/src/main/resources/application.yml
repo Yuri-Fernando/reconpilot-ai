@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: reconpilot-api
+  profiles:
+    default: local
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: app
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    create-schemas: true
+    default-schema: app
+    schemas: app
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  error:
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+app:
+  frontend-origins: ${APP_FRONTEND_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}
+  analytics:
+    enabled: ${AI_ENABLED:false}
+    base-url: ${AI_SERVICE_URL:http://localhost:8000}
+    token: ${AI_INTERNAL_TOKEN:}
+    timeout: 2s
