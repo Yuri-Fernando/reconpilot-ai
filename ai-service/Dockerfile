@@ -1,0 +1,11 @@
+FROM python:3.10-slim
+WORKDIR /srv
+COPY requirements.txt /srv/
+RUN pip install --no-cache-dir -r requirements.txt \
+    && useradd --system --no-create-home --uid 10001 reconpilot
+COPY app/ /srv/app/
+USER reconpilot
+EXPOSE 8000
+HEALTHCHECK --interval=15s --timeout=3s --retries=5 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

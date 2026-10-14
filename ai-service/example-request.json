@@ -1,0 +1,8 @@
+{
+  "batch_id": "recon-demo-001",
+  "enable_iforest": false,
+  "candidates": [
+    {"transaction_id": "tx-001", "amount_cents": 150000, "delta_cents": 0, "date_gap_days": 0, "possible_duplicate": false, "reference_conflict": false},
+    {"transaction_id": "tx-002", "amount_cents": 85000, "delta_cents": 5000, "date_gap_days": 3, "possible_duplicate": true, "reference_conflict": true}
+  ]
+}
